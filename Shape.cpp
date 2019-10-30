@@ -231,6 +231,7 @@ ReturnVal Triangle::intersect(const Ray & ray) const
     Vector3f A2 = vectorSubtraction(p1, p3);
 
     float determinantA       = determinant(A1, A2, direction);
+
     float determinantBeta    = determinant( B, A2, direction);
     float determinantGamma   = determinant(A1,  B, direction);
     float determinantT       = determinant(A1, A2, B);
@@ -267,12 +268,15 @@ Vector3f Triangle::normalize( Vector3f v) const{
     return v;
 }
 float Triangle::determinant(Vector3f a, Vector3f b, Vector3f c) const{
+    return a.x*b.y*c.z + b.x*c.y*a.z + c.x*a.y*b.z - a.z*b.y*c.x - b.z*c.y*a.x - c.z*a.y*b.x;
 
-   return (
-            (a.x)*((b.y*c.z) - (b.z*c.y)) + 
-            (b.x)*((a.y*c.z) - (a.z*c.y)) + 
-            (c.x)*((a.y*b.z) - (a.z*b.y))
-           );
+
+//    return (
+//             (a.x)*((b.y*c.z) - (b.z*c.y)) + 
+//             (b.x)*((a.y*c.z) - (a.z*c.y)) + 
+//             (c.x)*((a.y*b.z) - (a.z*b.y))
+//            );
+
 }
 Vector3f Triangle::scalarMultiplication(float t, Vector3f direction) const{
     Vector3f result;
