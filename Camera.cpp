@@ -36,10 +36,11 @@ Camera::Camera(int id,                      // Id of the camera
 
      
 
+     this->gaze = normalize(gaze);
      this->gaze.x = gaze.x;
      this->gaze.y = gaze.y;
      this->gaze.z = gaze.z;
-     this->gaze = normalize(gaze);
+     
 
      position.x = pos.x;
      position.y = pos.y;

@@ -63,6 +63,7 @@ private:
 	Vector3f vectorAddition(Vector3f a, Vector3f b) const;
 	float dotProduct(Vector3f a, Vector3f b) const;
 	float determinant(Vector3f a, Vector3f b, Vector3f c) const;
+	Vector3f normalize( Vector3f v) const;
 	
 };
 

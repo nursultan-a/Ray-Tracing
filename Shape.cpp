@@ -70,8 +70,8 @@ ReturnVal Sphere::intersect(const Ray & ray) const
     bool isDeltaPositive = true;
     Vector3f intersectionPoint1, intersectionPoint2;
 
-    // float a = dotProduct(ray.direction, ray.direction);
-    float a = 1;
+    float a = dotProduct(ray.direction, ray.direction);
+    // float a = 1;
     float b = 2 *
         dotProduct(
             ray.direction, 
@@ -86,8 +86,8 @@ ReturnVal Sphere::intersect(const Ray & ray) const
 
     float delta = (b * b) - (4 * a * c);
 
-    // if(delta < (-1)*pScene->intTestEps){
-    if(delta < 0){
+    if(delta < (-1)*pScene->intTestEps){
+    // if(delta < 0){
         isDeltaPositive = false;
     }else{
         t1 = ((-1) * b + sqrt(delta)) / (2 * a);
@@ -193,6 +193,18 @@ Triangle::Triangle(int id, int matIndex, int p1Index, int p2Index, int p3Index, 
     p3.x = pVertices->at(p3Index-1).x;
     p3.y = pVertices->at(p3Index-1).y;
     p3.z = pVertices->at(p3Index-1).z;
+
+    cout <<"triangle: [ " 
+    << p1.x 
+    << " , "<< p1.y
+    << " , "<< p1.z
+    << " ] - [ " << p2.x 
+    << " , "<< p2.y
+    << " , "<< p2.z
+    << " ] - [ "<< p3.x 
+    << " , "<< p3.y
+    << " , "<< p3.z
+    << " ] " <<endl;
 }
 
 /* Triangle-ray intersection routine. You will implement this. 
@@ -209,36 +221,58 @@ ReturnVal Triangle::intersect(const Ray & ray) const
 
     ReturnVal result;
 
-    Vector3f B = vectorSubtraction(ray.origin, p1);
+    Vector3f origin = normalize(ray.origin);
+    Vector3f direction = normalize(ray.direction);
+
+    Vector3f B = vectorSubtraction(p1, origin);
     float beta, gamma, t;
 
-    Vector3f A1 = vectorSubtraction(p2, p1);
-    Vector3f A2 = vectorSubtraction(p3, p1);
+    Vector3f A1 = vectorSubtraction(p1, p2);
+    Vector3f A2 = vectorSubtraction(p1, p3);
 
-    float determinantA = determinant(A1, A2, ray.direction);
-    float determinantBeta = determinant(B, A2, ray.direction);
-    float determinantGamma = determinant(A1, B, ray.direction);
-    float determinantT = determinant(A1, A2, B);
+    float determinantA       = determinant(A1, A2, direction);
+    float determinantBeta    = determinant( B, A2, direction);
+    float determinantGamma   = determinant(A1,  B, direction);
+    float determinantT       = determinant(A1, A2, B);
 
-    beta = determinantBeta/determinantA;
-    gamma = determinantGamma/determinantA;
-    t = determinantT/determinantA;
+    if(determinantA != 0){
+        beta = determinantBeta/determinantA;
+        gamma = determinantGamma/determinantA;
+        t = determinantT/determinantA;
 
-    if((gamma < 0) || (gamma > 1)){
-        result.isIntersects = false;
-    }else if((beta < 0) || (beta > (1 - gamma))){
-        result.isIntersects = false;
+        if((gamma < (0+ (-1)*pScene->intTestEps)) || (gamma > (1+(-1)*pScene->intTestEps))){
+            result.isIntersects = false;
+        }else if((beta < (0+(-1)*pScene->intTestEps)) || (beta > ((1 - gamma)+(-1)*pScene->intTestEps))){
+            result.isIntersects = false;
+        }else{
+            result.isIntersects = true;
+            result.t1 = t;
+        }
     }else{
-        result.isIntersects = true;
-        result.t1 = t;
+        result.isIntersects = false;
     }
 
 
     return result;
 }
+Vector3f Triangle::normalize( Vector3f v) const{
+    float len = std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+
+    if (len != 0.0)
+    {
+        v.x /= len;
+        v.y /= len;
+        v.z /= len;
+    }
+    return v;
+}
 float Triangle::determinant(Vector3f a, Vector3f b, Vector3f c) const{
 
-   return ((a.x)*((b.y*c.z) - (b.z*c.y)) + (b.x)*((a.y*c.z) - (a.z*c.y)) + (c.x)*((a.y*b.z) - (a.z*b.y)));
+   return (
+            (a.x)*((b.y*c.z) - (b.z*c.y)) + 
+            (b.x)*((a.y*c.z) - (a.z*c.y)) + 
+            (c.x)*((a.y*b.z) - (a.z*b.y))
+           );
 }
 Vector3f Triangle::scalarMultiplication(float t, Vector3f direction) const{
     Vector3f result;
