@@ -16,7 +16,7 @@ Image::Image(int width, int height)
 //
 void Image::setPixelValue(int col, int row, const Color& color)
 {
-    data[row][col] = color;
+    data[col][row] = color;
 }
 
 /* Takes the image name as a file and saves it as a ppm file. */

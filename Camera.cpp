@@ -4,6 +4,7 @@
 
 // not default
 #include <string.h>
+#include <math.h> 
 
 //not dependend
 #include <iostream>
@@ -33,21 +34,24 @@ Camera::Camera(int id,                      // Id of the camera
      this->imgPlane.nx = imgPlane.nx;
      this->imgPlane.ny = imgPlane.ny;
 
-     std::cout << "image plane left: " << imgPlane.left<< "   imagePlane right: " << imgPlane.right << std::endl; 
-
      
 
      this->gaze.x = gaze.x;
      this->gaze.y = gaze.y;
      this->gaze.z = gaze.z;
+     this->gaze = normalize(gaze);
 
      position.x = pos.x;
      position.y = pos.y;
      position.z = pos.z;
 
+     position= normalize(position);
+
      v.x = up.x;
      v.y = up.y;
      v.z = up.z;
+
+     v = normalize(v);
 
     //  w.x = gaze.x;
     //  w.y = gaze.y;
@@ -57,14 +61,21 @@ Camera::Camera(int id,                      // Id of the camera
      w.y = (-1)*gaze.y;
      w.z = (-1)*gaze.z;
 
+     w = normalize(w);
+
      u = crossProduct(v,w);
-
-     std::cout << "camera position: " << std::endl
-     << "    u: [" << u.x << ", "<<u.y<<", "<<u.z<< "]" << std::endl 
-     << "    v: [" << v.x << ", "<<v.y<<", "<<v.z<< "]" << std::endl
-     << "    w: [" << w.x << ", "<<w.y<<", "<<w.z<< "]" << std::endl ;
+     u = normalize(u);
 
 
+     midPoint = vectorAddition(position, scalarMultiplication(imgPlane.distance, gaze));
+
+     q =    vectorAddition(midPoint,vectorAddition(scalarMultiplication(imgPlane.left, u), scalarMultiplication(imgPlane.top, v)));
+
+     std::cout << "distance: " << imgPlane.distance << std::endl;
+     std::cout << "e: [" << position.x << "," << position.y << "," << position.z << "]" << std::endl;
+     std::cout << "w: [" << w.x << "," << w.y << "," << w.z << "]" << std::endl;
+     std::cout << "gaze: [" << gaze.x << "," << gaze.y << "," << gaze.z << "]" << std::endl;
+     std::cout <<"mid point : " << midPoint.x << "  "<< midPoint.y<< "  " << midPoint.z << std::endl;
 }
 
 /* Takes coordinate of an image pixel as row and col, and
@@ -78,9 +89,6 @@ Ray Camera::getPrimaryRay(int col, int row) const
      *                                             *
      ***********************************************
 	 */
-
-     //TODO: is point on image normalized??
-     std::cout << std::endl << "column:  " << col << "       row:  " << row << std:: endl;
      Ray primaryRay;
 
      primaryRay.origin.x = position.x;
@@ -89,25 +97,35 @@ Ray Camera::getPrimaryRay(int col, int row) const
 
      Vector3f pointOnImgPlane;
 
-     float xCoordinate = (row + 0.5) * (imgPlane.right - imgPlane.left) / imgPlane.nx;
-     float yCoordinate = (col + 0.5) * (imgPlane.top - imgPlane.bottom) / imgPlane.ny;
+     float xCoordinate = (row + 0.5) * ((imgPlane.right - imgPlane.left) / imgPlane.nx);
+     float yCoordinate = (col + 0.5) * ((imgPlane.top - imgPlane.bottom) / imgPlane.ny); 
+     float zCoordinate = (-1)*imgPlane.distance;
 
-    //  std::cout<< " x:" << xCoordinate<< " y:"<< yCoordinate<< std::endl;
 
-     pointOnImgPlane.x = xCoordinate;
-     pointOnImgPlane.y = yCoordinate;
-     pointOnImgPlane.z = gaze.z;
+     Vector3f su = scalarMultiplication(xCoordinate, u);
+     Vector3f sv = scalarMultiplication(yCoordinate, v);
+     Vector3f s = vectorAddition(q, vectorSubtraction(su, sv)); 
 
-     Vector3f direction = vectorSubtraction(pointOnImgPlane, position);
+     Vector3f direction = normalize(vectorSubtraction(s, position));
 
 
      primaryRay.direction.x = direction.x;
      primaryRay.direction.y = direction.y;
      primaryRay.direction.z = direction.z;
 
-     //std::cout << "primary ray is created and returned \n";
 
      return primaryRay;
+}
+Vector3f Camera::normalize( Vector3f v) const{
+    float len = std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+
+    if (len != 0.0)
+    {
+        v.x /= len;
+        v.y /= len;
+        v.z /= len;
+    }
+    return v;
 }
 
 Vector3f Camera::crossProduct(Vector3f a, Vector3f b)const{

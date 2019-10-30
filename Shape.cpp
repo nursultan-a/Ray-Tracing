@@ -45,10 +45,10 @@ Sphere::Sphere(int id, int matIndex, int cIndex, float R, vector<Vector3f> *pVer
 
 
     cout <<"sphere center: [ " 
-        << center.x 
-        << " , "<< center.y
-        << " , "<< center.z
-        << " ] " << endl;
+    << center.x 
+    << " , "<< center.y
+    << " , "<< center.z
+    << " ] " << endl;
 
 
 }
@@ -66,16 +66,9 @@ ReturnVal Sphere::intersect(const Ray & ray) const
 	 */
 
     ReturnVal result;
-    cout << "--------------------------------------------------------------------------- " << endl << endl;
     float t1, t2;
     bool isDeltaPositive = true;
     Vector3f intersectionPoint1, intersectionPoint2;
-
-    cout << "ray origin: [" << ray.origin.x << "," << ray.origin.y << "," << ray.origin.z << "]" << endl;
-    cout << "ray direction: [" <<  ray.direction.x << "," << ray.direction.y << "," << ray.direction.z << "]" << endl;
-    cout << "sphere center: [" <<  center.x << "," << center.y << "," << center.z << "]" << endl;
-    cout << "sphere radius: " << R << endl;
-
 
     // float a = dotProduct(ray.direction, ray.direction);
     float a = 1;
@@ -93,11 +86,9 @@ ReturnVal Sphere::intersect(const Ray & ray) const
 
     float delta = (b * b) - (4 * a * c);
 
-    cout << "a:" << a << "     b:" << b << "     c:" << c << "     delta: " << delta << endl;
-
+    // if(delta < (-1)*pScene->intTestEps){
     if(delta < 0){
         isDeltaPositive = false;
-        // cout << "ray do not intersects, delta = "<< delta << endl;
     }else{
         t1 = ((-1) * b + sqrt(delta)) / (2 * a);
         t2 = ((-1) * b - sqrt(delta)) / (2 * a);
@@ -110,7 +101,7 @@ ReturnVal Sphere::intersect(const Ray & ray) const
         }
         result.t1 = t1;
         result.t2 = t2;
-        cout << ">>>>>>>>>>>>>>>>>>>>t1:" << (((-1) * b + sqrt(b * b - delta)) / (2 * a)) << " t2:" << t2 << " delta:" << delta << endl;
+        isDeltaPositive = true;
     }
 
     if(isDeltaPositive){
@@ -170,6 +161,7 @@ float Sphere::dotProduct(Vector3f a, Vector3f b) const{
 
 
 ////////////////////////////////////////////////////////////////////////////sphere ends/////////////////////
+///////////////////////////////////////////////////////////triangle starts///////////////////////////
 
 Triangle::Triangle(void)
 {}
@@ -184,12 +176,23 @@ Triangle::Triangle(int id, int matIndex, int p1Index, int p2Index, int p3Index, 
      *                                             *
      ***********************************************
 	 */
+    this->id = id;
+    this->matIndex = matIndex;
+    this->p1Index = p1Index;
+    this->p2Index = p2Index;
+    this->p3Index = p3Index;
 
-    cout <<"triangle-- " 
-        << " [ "<<(*pVertices)[p1Index-1].x 
-        << " , "<<(*pVertices)[p2Index-1].y
-        << " , "<<(*pVertices)[p3Index-1].z
-        << " ]" << endl;
+    p1.x = pVertices->at(p1Index-1).x;
+    p1.y = pVertices->at(p1Index-1).y;
+    p1.z = pVertices->at(p1Index-1).z;
+
+    p2.x = pVertices->at(p2Index-1).x;
+    p2.y = pVertices->at(p2Index-1).y;
+    p2.z = pVertices->at(p2Index-1).z;
+
+    p3.x = pVertices->at(p3Index-1).x;
+    p3.y = pVertices->at(p3Index-1).y;
+    p3.z = pVertices->at(p3Index-1).z;
 }
 
 /* Triangle-ray intersection routine. You will implement this. 
@@ -203,23 +206,75 @@ ReturnVal Triangle::intersect(const Ray & ray) const
      *                                             *
      ***********************************************
 	 */
+
     ReturnVal result;
 
-    result.t1 = 0;
-    result.t2 = 0;
+    Vector3f B = vectorSubtraction(ray.origin, p1);
+    float beta, gamma, t;
 
-    result.intersectionPoint1[0] = 0;
-    result.intersectionPoint1[1] = 0;
-    result.intersectionPoint1[2] = 0;
+    Vector3f A1 = vectorSubtraction(p2, p1);
+    Vector3f A2 = vectorSubtraction(p3, p1);
 
-    result.intersectionPoint2[0] = 0;
-    result.intersectionPoint2[1] = 0;
-    result.intersectionPoint2[2] = 0;
-    result.isIntersects = false;
+    float determinantA = determinant(A1, A2, ray.direction);
+    float determinantBeta = determinant(B, A2, ray.direction);
+    float determinantGamma = determinant(A1, B, ray.direction);
+    float determinantT = determinant(A1, A2, B);
 
-    result.type = 't';
+    beta = determinantBeta/determinantA;
+    gamma = determinantGamma/determinantA;
+    t = determinantT/determinantA;
+
+    if((gamma < 0) || (gamma > 1)){
+        result.isIntersects = false;
+    }else if((beta < 0) || (beta > (1 - gamma))){
+        result.isIntersects = false;
+    }else{
+        result.isIntersects = true;
+        result.t1 = t;
+    }
+
+
     return result;
 }
+float Triangle::determinant(Vector3f a, Vector3f b, Vector3f c) const{
+
+   return ((a.x)*((b.y*c.z) - (b.z*c.y)) + (b.x)*((a.y*c.z) - (a.z*c.y)) + (c.x)*((a.y*b.z) - (a.z*b.y)));
+}
+Vector3f Triangle::scalarMultiplication(float t, Vector3f direction) const{
+    Vector3f result;
+
+    result.x = direction.x * t;
+    result.y = direction.y * t;
+    result.z = direction.z * t;
+
+    return result;
+}
+
+Vector3f Triangle::vectorSubtraction(Vector3f a, Vector3f b) const{
+    Vector3f result;
+    
+    result.x = a.x - b.x;
+    result.y = a.y - b.y;
+    result.z = a.z - b.z;
+
+    return result;
+}
+Vector3f Triangle::vectorAddition(Vector3f a, Vector3f b) const{
+    Vector3f result;
+    
+    result.x = a.x + b.x;
+    result.y = a.y + b.y;
+    result.z = a.z + b.z;
+
+    return result;
+
+}
+
+float Triangle::dotProduct(Vector3f a, Vector3f b) const{
+    
+    return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
+}
+///////////////////////////////////////////////////////////triangle ends///////////////////////////
 
 Mesh::Mesh()
 {}

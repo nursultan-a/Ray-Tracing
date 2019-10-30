@@ -24,8 +24,6 @@ Vector3f Ray::getPoint(float t) const
     Vector3f pointAtT;
     pointAtT = vectorAddition(origin,scalarMultiplication(t, direction));
 
-    std::cout << "vector at " << t << " ["<< pointAtT.x << ", "<< pointAtT.y << ", " << pointAtT.z <<"]"<< std::endl;
-
     return pointAtT;
 }
 

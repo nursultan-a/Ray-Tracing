@@ -37,12 +37,13 @@ private:
     //
 	// You can add member functions and variables here
     //
-    Vector3f position, gaze, v, u, w;
+    Vector3f position, gaze, v, u, w, midPoint,q,s;
     Vector3f crossProduct(Vector3f a, Vector3f b) const;
     Vector3f scalarMultiplication(float t, Vector3f direction) const;
 	Vector3f vectorSubtraction(Vector3f a, Vector3f b) const;
 	Vector3f vectorAddition(Vector3f a, Vector3f b) const;
 	float dotProduct(Vector3f a, Vector3f b) const;
+    Vector3f normalize( Vector3f v) const;
 };
 
 #endif

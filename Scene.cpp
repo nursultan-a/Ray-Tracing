@@ -7,6 +7,8 @@
 
 //not default
 #include <typeinfo>
+#include "Image.h"
+#include <limits>
 
 
 using namespace tinyxml2;
@@ -25,35 +27,42 @@ void Scene::renderScene(void)
 	 */
 	for (auto camera = cameras.begin(); camera != cameras.end(); camera++)
 	{
-		// cout << "camera id: "<< (*camera)->id << endl;
-		// cout << "image name: "<< (*camera)->imageName << endl;
+		Image renderedImage((*camera)->imgPlane.nx, (*camera)->imgPlane.ny);
+		unsigned long int counter=0;
+		unsigned long int total=0;
 
 		for(int y = 0 ; y < (*camera)->imgPlane.ny; y++)
 		{
 			for(int x = 0 ; x < (*camera)->imgPlane.nx; x++)
 			{
-				for (int c = 0; c < 3; ++c)
+				Ray primaryRay = (*camera)->getPrimaryRay(y, x);
+				Color values;
+				float minT = std::numeric_limits<float>::infinity();
+				for (auto object = objects.begin(); object != objects.end(); object++)
 				{
-					for (auto object = objects.begin(); object != objects.end(); object++)
-					{
-						// cout << "object id: " << (*object)->id << endl;
-						// cout << typeid(*object).name() << endl;
+					
+					ReturnVal intersectionDetails = (*object)->intersect(primaryRay);
+					if(intersectionDetails.isIntersects){
+						values.red = 255;
+						values.grn = 255;
+						values.blu = 255;
 
-						Ray primaryRay = (*camera)->getPrimaryRay(y, x);
-						// cout << "primary ray direction: [" << primaryRay.direction.x << ", " << primaryRay.direction.y << ", " << primaryRay.direction.z << "]" << endl;
-						// cout << "primary ray origin: [" << primaryRay.origin.x << ", " << primaryRay.origin.y << ", " << primaryRay.origin.z << "]" << endl;
-						ReturnVal intersectionDetails = (*object)->intersect(primaryRay);
-
-						if(intersectionDetails.isIntersects){
-							cout << "-------------" << intersectionDetails.type << endl;
-						}
-
-						
-						
+						counter++;
+						break;
 					}
+					else{
+						values.red = backgroundColor.r;
+						values.grn = backgroundColor.g;
+						values.blu = backgroundColor.b;
+					}
+					
 				}
+				total++;
+				renderedImage.setPixelValue(y,x, values);
 			}
 		}
+		renderedImage.saveImage((*camera)->imageName);
+		cout << endl<<"total colored pixels: " << counter << "  total pixel: " <<total <<endl << endl;
 	}
 
 	

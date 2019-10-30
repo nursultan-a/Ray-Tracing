@@ -54,6 +54,16 @@ public:
 
 private:
 	// Write any other stuff here
+	int id, matIndex, p1Index, p2Index, p3Index;
+	Vector3f p1, p2, p3;
+	
+	
+	Vector3f scalarMultiplication(float t, Vector3f direction) const;
+	Vector3f vectorSubtraction(Vector3f a, Vector3f b) const;
+	Vector3f vectorAddition(Vector3f a, Vector3f b) const;
+	float dotProduct(Vector3f a, Vector3f b) const;
+	float determinant(Vector3f a, Vector3f b, Vector3f c) const;
+	
 };
 
 // Class for mesh
