@@ -39,9 +39,11 @@ void Scene::renderScene(void)
 				Color values;
 				float minT = std::numeric_limits<float>::infinity();
 				for (auto object = objects.begin(); object != objects.end(); object++)
-				{
-					
+				{	
 					ReturnVal intersectionDetails = (*object)->intersect(primaryRay);
+					if (intersectionDetails.type == 'm' || intersectionDetails.type == 't'){
+						cout << "normal: " << intersectionDetails.normal[0] << endl;
+					}
 					if(intersectionDetails.isIntersects){
 						values.red = 255;
 						values.grn = 255;

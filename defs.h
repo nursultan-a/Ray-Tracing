@@ -21,6 +21,7 @@ typedef struct ReturnVal
 
 	float intersectionPoint1[3];
 	float intersectionPoint2[3];
+	float normal[3];
 
 	bool isIntersects;
 	char type;

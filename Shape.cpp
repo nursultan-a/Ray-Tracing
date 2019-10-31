@@ -231,12 +231,12 @@ ReturnVal Triangle::intersect(const Ray & ray) const
     Vector3f A2 = vectorSubtraction(p1, p3);
 
     float determinantA       = determinant(A1, A2, direction);
-
     float determinantBeta    = determinant( B, A2, direction);
     float determinantGamma   = determinant(A1,  B, direction);
     float determinantT       = determinant(A1, A2, B);
 
     if(determinantA != 0){
+        
         beta = determinantBeta/determinantA;
         gamma = determinantGamma/determinantA;
         t = determinantT/determinantA;
@@ -248,11 +248,37 @@ ReturnVal Triangle::intersect(const Ray & ray) const
         }else{
             result.isIntersects = true;
             result.t1 = t;
+            result.type = 't';
+            Vector3f normalVector = normal(vectorSubtraction(p2,p1),vectorSubtraction(p2,p3));
+            result.normal[0] = normalVector.x;
+            result.normal[1] = normalVector.y;
+            result.normal[2] = normalVector.z;
         }
     }else{
+        // cout << "determinant is gg" << endl;
         result.isIntersects = false;
     }
 
+    // cout <<"triangle: [ " 
+    // << p1.x 
+    // << " , "<< p1.y
+    // << " , "<< p1.z
+    // << " ] - [ " << p2.x 
+    // << " , "<< p2.y
+    // << " , "<< p2.z
+    // << " ] - [ "<< p3.x 
+    // << " , "<< p3.y
+    // << " , "<< p3.z
+    // << " ] " <<endl;
+
+    return result;
+}
+Vector3f Triangle::normal( Vector3f a, Vector3f b) const{
+    Vector3f result;
+
+    result.x = a.y * b.z - a.z*b.y;
+    result.y = a.z * b.x - a.x*b.z;
+    result.z = a.x * b.y - a.y*b.x;
 
     return result;
 }
@@ -269,14 +295,6 @@ Vector3f Triangle::normalize( Vector3f v) const{
 }
 float Triangle::determinant(Vector3f a, Vector3f b, Vector3f c) const{
     return a.x*b.y*c.z + b.x*c.y*a.z + c.x*a.y*b.z - a.z*b.y*c.x - b.z*c.y*a.x - c.z*a.y*b.x;
-
-
-//    return (
-//             (a.x)*((b.y*c.z) - (b.z*c.y)) + 
-//             (b.x)*((a.y*c.z) - (a.z*c.y)) + 
-//             (c.x)*((a.y*b.z) - (a.z*b.y))
-//            );
-
 }
 Vector3f Triangle::scalarMultiplication(float t, Vector3f direction) const{
     Vector3f result;
@@ -327,6 +345,12 @@ Mesh::Mesh(int id, int matIndex, const vector<Triangle>& faces, vector<int> *pIn
      *                                             *
      ***********************************************
 	 */
+    this->id = id;
+    this->matIndex = matIndex;
+    this->faces = faces;
+    this->pIndecies = pIndecies;
+    this->vertices = vertices;
+    cout<< "mesh construction" << endl;
 }
 
 /* Mesh-ray intersection routine. You will implement this. 
@@ -341,19 +365,23 @@ ReturnVal Mesh::intersect(const Ray & ray) const
      ***********************************************
 	 */
     ReturnVal result;
+    Triangle triangle = faces.at(1);
+    // ReturnVal triangleDetails = 
+    
+    // cout<< "mesh triangle [ "<< triangle.p1.x << endl;
 
-    result.t1 = 0;
-    result.t2 = 0;
+    // result.t1 = 0;
+    // result.t2 = 0;
 
-    result.intersectionPoint1[0] = 0;
-    result.intersectionPoint1[1] = 0;
-    result.intersectionPoint1[2] = 0;
+    // result.intersectionPoint1[0] = 0;
+    // result.intersectionPoint1[1] = 0;
+    // result.intersectionPoint1[2] = 0;
 
-    result.intersectionPoint2[0] = 0;
-    result.intersectionPoint2[1] = 0;
-    result.intersectionPoint2[2] = 0;
-    result.isIntersects = false;
-    result.type = 'm';
+    // result.intersectionPoint2[0] = 0;
+    // result.intersectionPoint2[1] = 0;
+    // result.intersectionPoint2[2] = 0;
+    // result.isIntersects = false;
+    // result.type = 'm';
 
     return result;
 }

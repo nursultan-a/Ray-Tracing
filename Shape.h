@@ -64,6 +64,7 @@ private:
 	float dotProduct(Vector3f a, Vector3f b) const;
 	float determinant(Vector3f a, Vector3f b, Vector3f c) const;
 	Vector3f normalize( Vector3f v) const;
+	Vector3f normal( Vector3f a, Vector3f b) const;
 	
 };
 
@@ -77,6 +78,10 @@ public:
 
 private:
 	// Write any other stuff here
+	int id, matIndex;
+	vector<Triangle> faces;
+	vector<int> *pIndecies;
+	vector<Vector3f> *vertices;
 };
 
 #endif
