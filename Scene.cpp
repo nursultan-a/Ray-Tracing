@@ -41,8 +41,11 @@ void Scene::renderScene(void)
 				for (auto object = objects.begin(); object != objects.end(); object++)
 				{	
 					ReturnVal intersectionDetails = (*object)->intersect(primaryRay);
+					if(intersectionDetails.t1 < minT){
+						
+					}
 					if (intersectionDetails.type == 'm' || intersectionDetails.type == 't'){
-						cout << "normal: " << intersectionDetails.normal[0] << endl;
+						// cout << "normal: " << intersectionDetails.normal[0] << endl;
 					}
 					if(intersectionDetails.isIntersects){
 						values.red = 255;

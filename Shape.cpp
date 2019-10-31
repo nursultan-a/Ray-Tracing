@@ -3,7 +3,8 @@
 #include <cstdio>
 
 // not default
-#include <math.h> 
+#include <math.h>
+#include <limits>
 
 //not dependent
 #include <iostream>
@@ -364,24 +365,20 @@ ReturnVal Mesh::intersect(const Ray & ray) const
      *                                             *
      ***********************************************
 	 */
-    ReturnVal result;
-    Triangle triangle = faces.at(1);
-    // ReturnVal triangleDetails = 
+    ReturnVal result, tmp;
+    int f = 0;
+    float minT = std::numeric_limits<float>::infinity();
+    for (auto i = faces.begin(); i != faces.end(); i++){
+        f++;
+        // cout << "mesh " << f << endl;
+        tmp = (*i).intersect(ray);
+        if (tmp.isIntersects && tmp.t1 < minT)
+        {
+            result = tmp;
+            minT = tmp.t1;
+        }   
+    }
     
-    // cout<< "mesh triangle [ "<< triangle.p1.x << endl;
-
-    // result.t1 = 0;
-    // result.t2 = 0;
-
-    // result.intersectionPoint1[0] = 0;
-    // result.intersectionPoint1[1] = 0;
-    // result.intersectionPoint1[2] = 0;
-
-    // result.intersectionPoint2[0] = 0;
-    // result.intersectionPoint2[1] = 0;
-    // result.intersectionPoint2[2] = 0;
-    // result.isIntersects = false;
-    // result.type = 'm';
 
     return result;
 }
