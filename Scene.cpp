@@ -37,16 +37,15 @@ void Scene::renderScene(void)
 			{
 				Ray primaryRay = (*camera)->getPrimaryRay(y, x);
 				Color values;
-				float minT = std::numeric_limits<float>::infinity();
+				values.red = 0;
+				values.grn = 0;
+				values.blu = 0;
+				float minT = std::numeric_limits<float>::infinity(); // INFINITY
+				float maxT = std::numeric_limits<float>::infinity(); // INFINITY
+				ReturnVal hitPoint;
 				for (auto object = objects.begin(); object != objects.end(); object++)
 				{	
 					ReturnVal intersectionDetails = (*object)->intersect(primaryRay);
-					if(intersectionDetails.t1 < minT){
-						
-					}
-					if (intersectionDetails.type == 'm' || intersectionDetails.type == 't'){
-						// cout << "normal: " << intersectionDetails.normal[0] << endl;
-					}
 					if(intersectionDetails.isIntersects){
 						values.red = 255;
 						values.grn = 255;
@@ -54,6 +53,30 @@ void Scene::renderScene(void)
 
 						counter++;
 						break;
+
+						// if(minT < intersectionDetails.t1){
+
+						// 	hitPoint.intersectionPoint1[0] = intersectionDetails.intersectionPoint1[0];
+						// 	hitPoint.intersectionPoint1[1] = intersectionDetails.intersectionPoint1[1];
+						// 	hitPoint.intersectionPoint1[2] = intersectionDetails.intersectionPoint1[2];
+
+						// 	hitPoint.intersectionPoint2[0] = intersectionDetails.intersectionPoint2[0];
+						// 	hitPoint.intersectionPoint2[1] = intersectionDetails.intersectionPoint2[1];
+						// 	hitPoint.intersectionPoint2[1] = intersectionDetails.intersectionPoint2[2];
+
+						// 	hitPoint.isIntersects = true;
+
+						// 	hitPoint.normal[0] = intersectionDetails.normal[0];
+						// 	hitPoint.normal[1] = intersectionDetails.normal[1];
+						// 	hitPoint.normal[2] = intersectionDetails.normal[2];
+
+						// 	hitPoint.t1 = intersectionDetails.t1;
+						// 	hitPoint.t2 = intersectionDetails.t2;
+
+						// 	hitPoint.type = intersectionDetails.type;
+
+						// 	minT = intersectionDetails.t1;
+						// }
 					}
 					else{
 						values.red = backgroundColor.r;
@@ -62,6 +85,19 @@ void Scene::renderScene(void)
 					}
 					
 				}
+				// if(hitPoint.isIntersects && minT < maxT){
+				// 		values.red = 255;
+				// 		values.grn = 255;
+				// 		values.blu = 255;
+
+				// 		counter++;
+				// 		// break;
+				// 	}
+				// else{
+				// 		values.red = backgroundColor.r;
+				// 		values.grn = backgroundColor.g;
+				// 		values.blu = backgroundColor.b;
+				// 	}
 				total++;
 				renderedImage.setPixelValue(y,x, values);
 			}

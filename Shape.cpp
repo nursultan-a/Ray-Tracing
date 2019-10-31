@@ -120,6 +120,15 @@ ReturnVal Sphere::intersect(const Ray & ray) const
 
     result.isIntersects = isDeltaPositive;
     result.type = 's';
+    // if (result.isIntersects)
+    // {
+    //     cout << "hits sphere" << endl;
+    // }
+    // else
+    // {
+    //     cout << "do not     hits sphere" << endl;
+    // }
+    
 
     
     return result;

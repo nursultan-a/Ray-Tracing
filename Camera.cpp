@@ -22,61 +22,63 @@ Camera::Camera(int id,                      // Id of the camera
      *                                             *
      ***********************************************
 	 */
-     this->id = id;
+    this->id = id;
 
-     strcpy(this->imageName, imageName);
+    strcpy(this->imageName, imageName);
 
-     this->imgPlane.left = imgPlane.left;
-     this->imgPlane.right = imgPlane.right;
-     this->imgPlane.bottom = imgPlane.bottom;
-     this->imgPlane.top = imgPlane.top;
-     this->imgPlane.distance = imgPlane.distance;
-     this->imgPlane.nx = imgPlane.nx;
-     this->imgPlane.ny = imgPlane.ny;
+    this->imgPlane.left = imgPlane.left;
+    this->imgPlane.right = imgPlane.right;
+    this->imgPlane.bottom = imgPlane.bottom;
+    this->imgPlane.top = imgPlane.top;
+    this->imgPlane.distance = imgPlane.distance;
+    this->imgPlane.nx = imgPlane.nx;
+    this->imgPlane.ny = imgPlane.ny;
 
-     
+    
 
-     this->gaze = normalize(gaze);
-     this->gaze.x = gaze.x;
-     this->gaze.y = gaze.y;
-     this->gaze.z = gaze.z;
-     
+    
+    
+    
 
-     position.x = pos.x;
-     position.y = pos.y;
-     position.z = pos.z;
+    position.x = pos.x;
+    position.y = pos.y;
+    position.z = pos.z;
 
-     position= normalize(position);
+    // position= normalize(position);
 
-     v.x = up.x;
-     v.y = up.y;
-     v.z = up.z;
+    v.x = up.x;
+    v.y = up.y;
+    v.z = up.z;
 
-     v = normalize(v);
+    // v = normalize(v);
 
     //  w.x = gaze.x;
     //  w.y = gaze.y;
     //  w.z = gaze.z;
+    this->gaze.x = gaze.x;
+    this->gaze.y = gaze.y;
+    this->gaze.z = gaze.z;
+    // this->gaze = normalize(gaze);
 
-     w.x = (-1)*gaze.x;
-     w.y = (-1)*gaze.y;
-     w.z = (-1)*gaze.z;
+    w.x = (-1)*gaze.x;
+    w.y = (-1)*gaze.y;
+    w.z = (-1)*gaze.z;
 
-     w = normalize(w);
+    // w = normalize(w);
 
-     u = crossProduct(v,w);
-     u = normalize(u);
+    u = crossProduct(v,w);
+    // u = normalize(u);
 
 
-     midPoint = vectorAddition(position, scalarMultiplication(imgPlane.distance, gaze));
+    midPoint = vectorAddition(position, scalarMultiplication(imgPlane.distance, gaze));
 
-     q =    vectorAddition(midPoint,vectorAddition(scalarMultiplication(imgPlane.left, u), scalarMultiplication(imgPlane.top, v)));
+    q =    vectorAddition(midPoint,vectorAddition(scalarMultiplication(imgPlane.left, u), scalarMultiplication(imgPlane.top, v)));
 
-     std::cout << "distance: " << imgPlane.distance << std::endl;
-     std::cout << "e: [" << position.x << "," << position.y << "," << position.z << "]" << std::endl;
-     std::cout << "w: [" << w.x << "," << w.y << "," << w.z << "]" << std::endl;
-     std::cout << "gaze: [" << gaze.x << "," << gaze.y << "," << gaze.z << "]" << std::endl;
-     std::cout <<"mid point : " << midPoint.x << "  "<< midPoint.y<< "  " << midPoint.z << std::endl;
+    std::cout << "distance: " << imgPlane.distance << std::endl;
+    std::cout << "e: [" << position.x << "," << position.y << "," << position.z << "]" << std::endl;
+    std::cout << "w: [" << w.x << "," << w.y << "," << w.z << "]" << std::endl;
+    std::cout << "gaze: [" << gaze.x << "," << gaze.y << "," << gaze.z << "]" << std::endl;
+    std::cout <<"mid point : " << midPoint.x << "  "<< midPoint.y<< "  " << midPoint.z << std::endl;
 }
 
 /* Takes coordinate of an image pixel as row and col, and
@@ -107,7 +109,7 @@ Ray Camera::getPrimaryRay(int col, int row) const
      Vector3f sv = scalarMultiplication(yCoordinate, v);
      Vector3f s = vectorAddition(q, vectorSubtraction(su, sv)); 
 
-     Vector3f direction = normalize(vectorSubtraction(s, position));
+     Vector3f direction = (vectorSubtraction(s, position));
 
 
      primaryRay.direction.x = direction.x;
