@@ -9,6 +9,7 @@
 #include <typeinfo>
 #include "Image.h"
 #include <limits>
+#include <math.h>
 
 
 using namespace tinyxml2;
@@ -52,17 +53,84 @@ void Scene::renderScene(void)
 
 						// cout << "minT: " << minT << endl;
 
-						hitPoint = intersectionDetails; // shallow copy, what happens to array variables?
+						// hitPoint = intersectionDetails; // shallow copy, what happens to array variables?
+						hitPoint.id = intersectionDetails.id;
+						hitPoint.matIndex = intersectionDetails.matIndex;
+						hitPoint.t1 = intersectionDetails.t1;
+						hitPoint.t2 = intersectionDetails.t2;
+						hitPoint.type = intersectionDetails.type;
+						hitPoint.isIntersects = intersectionDetails.isIntersects;
+
+
+						hitPoint.intersectionPoint1[0] = intersectionDetails.intersectionPoint1[0];
+						hitPoint.intersectionPoint1[1] = intersectionDetails.intersectionPoint1[1];
+						hitPoint.intersectionPoint1[2] = intersectionDetails.intersectionPoint1[2];
+
+						hitPoint.intersectionPoint2[0] = intersectionDetails.intersectionPoint2[0];
+						hitPoint.intersectionPoint2[1] = intersectionDetails.intersectionPoint2[1];
+						hitPoint.intersectionPoint2[2] = intersectionDetails.intersectionPoint2[2];
+
+						hitPoint.normal[0] = intersectionDetails.normal[0];
+						hitPoint.normal[1] = intersectionDetails.normal[1];
+						hitPoint.normal[2] = intersectionDetails.normal[2];
 
 						minT = intersectionDetails.t1;
 					}					
 				}
 				if(hitPoint.isIntersects && minT < infinity && minT >= (-1)*intTestEps){
-						values.red = 255;
-						values.grn = 255;
-						values.blu = 255;
+					Vector3f diffuseLight = {50,50,50};
+					for (auto i = lights.begin(); i != lights.end(); i++)
+					{
+						Vector3f point;
+						point.x = hitPoint.intersectionPoint1[0];
+						point.y = hitPoint.intersectionPoint1[1];
+						point.z = hitPoint.intersectionPoint1[2];
+
+						Vector3f intensityOverDistance = (*i)->computeLightContribution(point);
+						Vector3f wi = vectorSubtraction((*i)->position, point);
+						Vector3f diffuseRef = materials[hitPoint.matIndex-1]->diffuseRef;
+						
+
+						float cosTheta = 0;
+						Vector3f normal;
+
+						normal.x = hitPoint.normal[0];
+						normal.y = hitPoint.normal[1];
+						normal.z = hitPoint.normal[2];
+
+						// normal = normal);
+						cout << normal.x << ", " << normal.y << ", " << normal.z << "type: "<<hitPoint.type <<endl;
+						if(dotProduct(normalize(wi), normal)>0.0){
+							cosTheta = dotProduct(normalize(wi), normal);
+						}
+
+						diffuseRef = scalarMultiplication(cosTheta, diffuseRef);
+
+						Vector3f diffuseShading;
+						diffuseShading.r = diffuseRef.r * intensityOverDistance.r;
+						diffuseShading.g = diffuseRef.g * intensityOverDistance.g;
+						diffuseShading.b = diffuseRef.b * intensityOverDistance.b;
+
+						diffuseLight.r += diffuseShading.r;
+						diffuseLight.g += diffuseShading.g;
+						diffuseLight.b += diffuseShading.b;
+						// cout <<"light position  "<<(*i)->position.x<<", "<<(*i)->position.y<<", "<<(*i)->position.x << endl;
+					}
+					
+						Vector3f ambi;
+						ambi.x = materials[hitPoint.matIndex-1]->ambientRef.x * ambientLight.x;
+						ambi.y = materials[hitPoint.matIndex-1]->ambientRef.y * ambientLight.y;
+						ambi.z = materials[hitPoint.matIndex-1]->ambientRef.z * ambientLight.z;
+						values.red = diffuseLight.r + ambi.x;
+						values.grn = diffuseLight.g + ambi.y;
+						values.blu = diffuseLight.b + ambi.z;
 
 						counter++;
+				}
+				else{
+					values.red = 100;
+					values.grn = 100;
+					values.blu = 100;
 				}
 				total++;
 				renderedImage.setPixelValue(y,x, values);
@@ -76,6 +144,65 @@ void Scene::renderScene(void)
 	
 	
 }
+////////////////// Private functions starts//////////////////////
+Vector3f Scene::normal( Vector3f a, Vector3f b) const{
+    Vector3f result;
+
+    result.x = a.y * b.z - a.z*b.y;
+    result.y = a.z * b.x - a.x*b.z;
+    result.z = a.x * b.y - a.y*b.x;
+
+    return result;
+}
+Vector3f Scene::normalize( Vector3f v) const{
+    float len = std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+
+    if (len != 0.0)
+    {
+        v.x /= len;
+        v.y /= len;
+        v.z /= len;
+    }
+    return v;
+}
+float Scene::determinant(Vector3f a, Vector3f b, Vector3f c) const{
+    return a.x*b.y*c.z + b.x*c.y*a.z + c.x*a.y*b.z - a.z*b.y*c.x - b.z*c.y*a.x - c.z*a.y*b.x;
+}
+Vector3f Scene::scalarMultiplication(float t, Vector3f direction) const{
+    Vector3f result;
+
+    result.x = direction.x * t;
+    result.y = direction.y * t;
+    result.z = direction.z * t;
+
+    return result;
+}
+
+Vector3f Scene::vectorSubtraction(Vector3f a, Vector3f b) const{
+    Vector3f result;
+    
+    result.x = a.x - b.x;
+    result.y = a.y - b.y;
+    result.z = a.z - b.z;
+
+    return result;
+}
+Vector3f Scene::vectorAddition(Vector3f a, Vector3f b) const{
+    Vector3f result;
+    
+    result.x = a.x + b.x;
+    result.y = a.y + b.y;
+    result.z = a.z + b.z;
+
+    return result;
+
+}
+
+float Scene::dotProduct(Vector3f a, Vector3f b) const{
+    
+    return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
+}
+////////////////// Private functions ends //////////////////////
 
 // Parses XML file. 
 Scene::Scene(const char *xmlPath)

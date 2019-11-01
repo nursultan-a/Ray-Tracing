@@ -67,6 +67,8 @@ ReturnVal Sphere::intersect(const Ray & ray) const
 	 */
 
     ReturnVal result;
+    result.id = id;
+    result.matIndex = matIndex;
     float t1 = std::numeric_limits<double>::infinity(), t2=std::numeric_limits<double>::infinity();
     bool isDeltaPositive = false;
     Vector3f intersectionPoint1, intersectionPoint2;
@@ -111,6 +113,12 @@ ReturnVal Sphere::intersect(const Ray & ray) const
         result.intersectionPoint2[0] = intersectionPoint2.x;
         result.intersectionPoint2[1] = intersectionPoint2.y;
         result.intersectionPoint2[2] = intersectionPoint2.z;
+
+        Vector3f normalVectorOfPoint = normal(intersectionPoint1);
+
+        result.normal[0] = normalVectorOfPoint.x;
+        result.normal[1] = normalVectorOfPoint.y;
+        result.normal[2] = normalVectorOfPoint.z;
     }
 
     result.isIntersects = isDeltaPositive;
@@ -162,6 +170,21 @@ Vector3f Sphere::vectorAddition(Vector3f a, Vector3f b) const{
 float Sphere::dotProduct(Vector3f a, Vector3f b) const{
     
     return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
+}
+Vector3f Sphere::normal(Vector3f intersectionPoint)const{
+    Vector3f result = scalarMultiplication((1/R), vectorSubtraction(intersectionPoint, center));
+    return result;
+}
+Vector3f Sphere::normalize( Vector3f v) const{
+    float len = std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+
+    if (len != 0.0)
+    {
+        v.x /= len;
+        v.y /= len;
+        v.z /= len;
+    }
+    return v;
 }
 
 
@@ -225,7 +248,9 @@ ReturnVal Triangle::intersect(const Ray & ray) const
 	 */
 
     ReturnVal result;
+    result.id = id;
     float t1 = std::numeric_limits<double>::infinity(), t2=std::numeric_limits<double>::infinity();
+    result.t1 = std::numeric_limits<double>::infinity(), result.t2=std::numeric_limits<double>::infinity();
 
     Vector3f origin = normalize(ray.origin);
     Vector3f direction = normalize(ray.direction);
@@ -243,9 +268,7 @@ ReturnVal Triangle::intersect(const Ray & ray) const
     float determinantT       = determinant(A1, A2, B);
 
     if((determinantA > (-1)*pScene->intTestEps || 
-        determinantA < pScene->intTestEps) &&
-        t >= 0 + (-1)*pScene->intTestEps || 
-        t < pScene->intTestEps)
+        determinantA < pScene->intTestEps))
     { //TODO:clerify
         
         // Gramer's Rule for finding determinant of gamma, beta, time
@@ -255,7 +278,7 @@ ReturnVal Triangle::intersect(const Ray & ray) const
 
         t = determinantT/determinantA;
         // cout << "t:           "<< t << endl;
-        if(t < 0.000){
+        if(t < pScene->intTestEps){
             result.isIntersects = false;
         }
         else if
@@ -269,7 +292,8 @@ ReturnVal Triangle::intersect(const Ray & ray) const
         else if
         (
             (beta < (0+(-1)*pScene->intTestEps)) ||
-            (beta > ((1 - gamma)+(-1)*pScene->intTestEps))
+           // (beta > ((1 - gamma)+(-1)*pScene->intTestEps))
+           (beta > ((1 - gamma)+pScene->intTestEps))
         )
         {
             result.isIntersects = false;
@@ -279,7 +303,7 @@ ReturnVal Triangle::intersect(const Ray & ray) const
             result.isIntersects = true;
             result.t1 = t;
             result.type = 't';
-            Vector3f normalVector = normal(vectorSubtraction(p2,p1),vectorSubtraction(p2,p3));
+            Vector3f normalVector = normalize(normal(vectorSubtraction(p3,p2),vectorSubtraction(p1,p2)));
             result.normal[0] = normalVector.x;
             result.normal[1] = normalVector.y;
             result.normal[2] = normalVector.z;
@@ -394,13 +418,36 @@ ReturnVal Mesh::intersect(const Ray & ray) const
      ***********************************************
 	 */
     ReturnVal result, tmp;
+    result.id = id;
+    result.matIndex = matIndex;
     float minT = std::numeric_limits<float>::infinity();
     for (auto i = faces.begin(); i != faces.end(); i++){
         tmp = (*i).intersect(ray);
-        if (tmp.isIntersects && minT > tmp.t1)
+        if(tmp.t1 < 0.000 - pScene->intTestEps){ // TODO: check time 
+            result.isIntersects = false;
+        }
+        else if (tmp.isIntersects && minT > tmp.t1)
         {
-            result = tmp;
             minT = tmp.t1;
+
+            result.normal[0] = tmp.normal[0];
+            result.normal[1] = tmp.normal[1];
+            result.normal[2] = tmp.normal[2];
+
+            result.intersectionPoint1[0] = tmp.intersectionPoint1[0];
+            result.intersectionPoint1[1] = tmp.intersectionPoint1[1];
+            result.intersectionPoint1[2] = tmp.intersectionPoint1[2];
+
+            result.intersectionPoint2[0] = tmp.intersectionPoint2[0];
+            result.intersectionPoint2[1] = tmp.intersectionPoint2[1];
+            result.intersectionPoint2[2] = tmp.intersectionPoint2[2];
+
+            result.isIntersects = tmp.isIntersects;
+
+            result.t1 = tmp.t1;
+            result.t2 = tmp.t2;
+
+            result.type = tmp.type;
         }   
     }
     

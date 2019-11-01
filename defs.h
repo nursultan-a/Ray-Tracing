@@ -15,7 +15,8 @@ typedef struct ReturnVal
      *                                             *
      ***********************************************
 	 */
-
+	int id;
+	int matIndex;
 	float t1;
 	float t2;
 

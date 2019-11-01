@@ -41,6 +41,8 @@ private:
 	Vector3f vectorSubtraction(Vector3f a, Vector3f b) const;
 	Vector3f vectorAddition(Vector3f a, Vector3f b) const;
 	float dotProduct(Vector3f a, Vector3f b) const;
+	Vector3f normal(Vector3f intersectionPoint) const;
+	Vector3f normalize(Vector3f v) const;
 	
 };
 
@@ -64,7 +66,7 @@ private:
 	float dotProduct(Vector3f a, Vector3f b) const;
 	float determinant(Vector3f a, Vector3f b, Vector3f c) const;
 	Vector3f normalize( Vector3f v) const;
-	Vector3f normal( Vector3f a, Vector3f b) const;
+	Vector3f normal( Vector3f center, Vector3f intersectionPoint) const;
 	
 };
 

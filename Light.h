@@ -17,6 +17,14 @@ public:
 private:
 
     Vector3f intensity;	// Intensity of the point light
+
+    Vector3f scalarMultiplication(float t, Vector3f direction) const;
+	Vector3f vectorSubtraction(Vector3f a, Vector3f b) const;
+	Vector3f vectorAddition(Vector3f a, Vector3f b) const;
+	float dotProduct(Vector3f a, Vector3f b) const;
+	float determinant(Vector3f a, Vector3f b, Vector3f c) const;
+	Vector3f normalize( Vector3f v) const;
+	Vector3f normal( Vector3f center, Vector3f intersectionPoint) const;
 };
 
 
