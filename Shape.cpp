@@ -67,7 +67,7 @@ ReturnVal Sphere::intersect(const Ray & ray) const
 	 */
 
     ReturnVal result;
-    float t1, t2;
+    float t1 = std::numeric_limits<double>::infinity(), t2=std::numeric_limits<double>::infinity();
     bool isDeltaPositive = false;
     Vector3f intersectionPoint1, intersectionPoint2;
 
@@ -90,7 +90,7 @@ ReturnVal Sphere::intersect(const Ray & ray) const
         t2 = ((-1) * b - sqrt(delta)) / (2 * a);
 
         float tmp;
-        if(t1 > t2){
+        if(t1 > t2 && t2 >= 0 + pScene->intTestEps){
             tmp = t1;
             t1 = t2;
             t2 = tmp;
@@ -225,6 +225,7 @@ ReturnVal Triangle::intersect(const Ray & ray) const
 	 */
 
     ReturnVal result;
+    float t1 = std::numeric_limits<double>::infinity(), t2=std::numeric_limits<double>::infinity();
 
     Vector3f origin = normalize(ray.origin);
     Vector3f direction = normalize(ray.direction);
@@ -241,7 +242,11 @@ ReturnVal Triangle::intersect(const Ray & ray) const
     float determinantGamma   = determinant(A1,  B, direction);
     float determinantT       = determinant(A1, A2, B);
 
-    if(determinantA != 0){
+    if((determinantA > (-1)*pScene->intTestEps || 
+        determinantA < pScene->intTestEps) &&
+        t >= 0 + (-1)*pScene->intTestEps || 
+        t < pScene->intTestEps)
+    { //TODO:clerify
         
         // Gramer's Rule for finding determinant of gamma, beta, time
         beta = determinantBeta/determinantA;
@@ -249,8 +254,11 @@ ReturnVal Triangle::intersect(const Ray & ray) const
         gamma = determinantGamma/determinantA;
 
         t = determinantT/determinantA;
-
-        if
+        // cout << "t:           "<< t << endl;
+        if(t < 0.000){
+            result.isIntersects = false;
+        }
+        else if
         (
             (gamma < (0+ (-1)*pScene->intTestEps)) || 
             (gamma > (1+(-1)*pScene->intTestEps))

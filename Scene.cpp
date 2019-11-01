@@ -57,7 +57,7 @@ void Scene::renderScene(void)
 						minT = intersectionDetails.t1;
 					}					
 				}
-				if(hitPoint.isIntersects && minT < infinity && minT > (-1)*intTestEps){
+				if(hitPoint.isIntersects && minT < infinity && minT >= (-1)*intTestEps){
 						values.red = 255;
 						values.grn = 255;
 						values.blu = 255;
