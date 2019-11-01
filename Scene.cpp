@@ -77,8 +77,9 @@ void Scene::renderScene(void)
 						minT = intersectionDetails.t1;
 					}					
 				}
+				Vector3f diffuseLight = {50,50,50};
 				if(hitPoint.isIntersects && minT < infinity && minT >= (-1)*intTestEps){
-					Vector3f diffuseLight = {50,50,50};
+					
 					for (auto i = lights.begin(); i != lights.end(); i++)
 					{
 						Vector3f point;
@@ -128,9 +129,9 @@ void Scene::renderScene(void)
 						counter++;
 				}
 				else{
-					values.red = 100;
-					values.grn = 100;
-					values.blu = 100;
+					values.red = backgroundColor.x;
+					values.grn = backgroundColor.y;
+					values.blu = backgroundColor.z;
 				}
 				total++;
 				renderedImage.setPixelValue(y,x, values);
