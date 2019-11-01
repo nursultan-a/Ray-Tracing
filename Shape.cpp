@@ -68,29 +68,24 @@ ReturnVal Sphere::intersect(const Ray & ray) const
 
     ReturnVal result;
     float t1, t2;
-    bool isDeltaPositive = true;
+    bool isDeltaPositive = false;
     Vector3f intersectionPoint1, intersectionPoint2;
 
     float a = dotProduct(ray.direction, ray.direction);
     // float a = 1;
     float b = 2 *
-        dotProduct(
-            ray.direction, 
-            vectorSubtraction(
-                ray.origin, center
-            )
-        );
+              dotProduct(
+                  ray.direction, 
+                  vectorSubtraction(ray.origin, center)
+              );
     float c = dotProduct(
-                vectorSubtraction(ray.origin, center),
+                vectorSubtraction(ray.origin, center), 
                 vectorSubtraction(ray.origin, center)
               ) - R*R;
 
     float delta = (b * b) - (4 * a * c);
 
-    if(delta < (-1)*pScene->intTestEps){
-    // if(delta < 0){
-        isDeltaPositive = false;
-    }else{
+    if(delta > (-1)*pScene->intTestEps){
         t1 = ((-1) * b + sqrt(delta)) / (2 * a);
         t2 = ((-1) * b - sqrt(delta)) / (2 * a);
 
@@ -240,6 +235,7 @@ ReturnVal Triangle::intersect(const Ray & ray) const
     Vector3f A1 = vectorSubtraction(p1, p2);
     Vector3f A2 = vectorSubtraction(p1, p3);
 
+    
     float determinantA       = determinant(A1, A2, direction);
     float determinantBeta    = determinant( B, A2, direction);
     float determinantGamma   = determinant(A1,  B, direction);
@@ -247,15 +243,31 @@ ReturnVal Triangle::intersect(const Ray & ray) const
 
     if(determinantA != 0){
         
+        // Gramer's Rule for finding determinant of gamma, beta, time
         beta = determinantBeta/determinantA;
+
         gamma = determinantGamma/determinantA;
+
         t = determinantT/determinantA;
 
-        if((gamma < (0+ (-1)*pScene->intTestEps)) || (gamma > (1+(-1)*pScene->intTestEps))){
+        if
+        (
+            (gamma < (0+ (-1)*pScene->intTestEps)) || 
+            (gamma > (1+(-1)*pScene->intTestEps))
+        )
+        {
             result.isIntersects = false;
-        }else if((beta < (0+(-1)*pScene->intTestEps)) || (beta > ((1 - gamma)+(-1)*pScene->intTestEps))){
+        }
+        else if
+        (
+            (beta < (0+(-1)*pScene->intTestEps)) ||
+            (beta > ((1 - gamma)+(-1)*pScene->intTestEps))
+        )
+        {
             result.isIntersects = false;
-        }else{
+        }
+        else
+        {
             result.isIntersects = true;
             result.t1 = t;
             result.type = 't';
@@ -265,7 +277,6 @@ ReturnVal Triangle::intersect(const Ray & ray) const
             result.normal[2] = normalVector.z;
         }
     }else{
-        // cout << "determinant is gg" << endl;
         result.isIntersects = false;
     }
 
@@ -375,13 +386,10 @@ ReturnVal Mesh::intersect(const Ray & ray) const
      ***********************************************
 	 */
     ReturnVal result, tmp;
-    int f = 0;
     float minT = std::numeric_limits<float>::infinity();
     for (auto i = faces.begin(); i != faces.end(); i++){
-        f++;
-        // cout << "mesh " << f << endl;
         tmp = (*i).intersect(ray);
-        if (tmp.isIntersects && tmp.t1 < minT)
+        if (tmp.isIntersects && minT > tmp.t1)
         {
             result = tmp;
             minT = tmp.t1;

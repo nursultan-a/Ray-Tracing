@@ -34,49 +34,44 @@ Camera::Camera(int id,                      // Id of the camera
     this->imgPlane.nx = imgPlane.nx;
     this->imgPlane.ny = imgPlane.ny;
 
-    
-
-    
-    
-    
-
+    // Camera position according to global/world coordinate system
     position.x = pos.x;
     position.y = pos.y;
     position.z = pos.z;
 
-    // position= normalize(position);
-
+    // camera orientation: v->up, w-> opposite direction of the cameras lens/gaze, u-> cross product of v and u 
     v.x = up.x;
     v.y = up.y;
     v.z = up.z;
 
-    // v = normalize(v);
-
-    //  w.x = gaze.x;
-    //  w.y = gaze.y;
-    //  w.z = gaze.z;
     this->gaze.x = gaze.x;
     this->gaze.y = gaze.y;
     this->gaze.z = gaze.z;
-    // this->gaze = normalize(gaze);
+    
 
     w.x = (-1)*gaze.x;
     w.y = (-1)*gaze.y;
     w.z = (-1)*gaze.z;
 
-    // w = normalize(w);
-
     u = crossProduct(v,w);
-    // u = normalize(u);
 
+    // camera orientation vectors should be normalized
+    w = normalize(w);
+    u = normalize(u);
+    v = normalize(v);
 
+    // center/middle point of image plane
     midPoint = vectorAddition(position, scalarMultiplication(imgPlane.distance, gaze));
 
-    q =    vectorAddition(midPoint,vectorAddition(scalarMultiplication(imgPlane.left, u), scalarMultiplication(imgPlane.top, v)));
+    // vector that points from Camera positioin to (0,0) pixel of image plane
+    q =  vectorAddition(midPoint,vectorAddition(scalarMultiplication(imgPlane.left, u), scalarMultiplication(imgPlane.top, v)));
 
     std::cout << "distance: " << imgPlane.distance << std::endl;
-    std::cout << "e: [" << position.x << "," << position.y << "," << position.z << "]" << std::endl;
-    std::cout << "w: [" << w.x << "," << w.y << "," << w.z << "]" << std::endl;
+    std::cout << "camera position: [" << position.x << "," << position.y << "," << position.z << "]" << std::endl;
+    std::cout << "camera orientation:"<< std::endl;
+    std::cout << " v: [" << v.x << "," << v.y << "," << v.z << "]" << std::endl;
+    std::cout << " w: [" << w.x << "," << w.y << "," << w.z << "]" << std::endl;
+    std::cout << " u: [" << u.x << "," << u.y << "," << u.z << "]" << std::endl;
     std::cout << "gaze: [" << gaze.x << "," << gaze.y << "," << gaze.z << "]" << std::endl;
     std::cout <<"mid point : " << midPoint.x << "  "<< midPoint.y<< "  " << midPoint.z << std::endl;
 }
@@ -109,7 +104,7 @@ Ray Camera::getPrimaryRay(int col, int row) const
      Vector3f sv = scalarMultiplication(yCoordinate, v);
      Vector3f s = vectorAddition(q, vectorSubtraction(su, sv)); 
 
-     Vector3f direction = (vectorSubtraction(s, position));
+     Vector3f direction = normalize(vectorSubtraction(s, position));
 
 
      primaryRay.direction.x = direction.x;

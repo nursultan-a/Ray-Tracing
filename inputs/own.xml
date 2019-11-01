@@ -70,15 +70,15 @@
                 5 6 7
             </Indices>
         </Triangle> -->
-        <!-- <Sphere id="1">
+        <Sphere id="1">
             <Material>1</Material>
             <Center>8</Center>
             <Radius>0.3</Radius>
-        </Sphere> -->
+        </Sphere>
         <Sphere id="2">
             <Material>1</Material>
             <Center>9</Center>
-            <Radius>0.01</Radius>
+            <Radius>0.5</Radius>
         </Sphere>
     </Objects>
 </Scene>

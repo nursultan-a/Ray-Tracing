@@ -36,68 +36,34 @@ void Scene::renderScene(void)
 			for(int x = 0 ; x < (*camera)->imgPlane.nx; x++)
 			{
 				Ray primaryRay = (*camera)->getPrimaryRay(y, x);
-				Color values;
-				values.red = 0;
-				values.grn = 0;
-				values.blu = 0;
+
+				Color values{0,0,0};
+				// Color values{backgroundColor.r,backgroundColor.g,backgroundColor.};
+
 				float minT = std::numeric_limits<float>::infinity(); // INFINITY
-				float maxT = std::numeric_limits<float>::infinity(); // INFINITY
+				float infinity = std::numeric_limits<float>::infinity(); // INFINITY
+
 				ReturnVal hitPoint;
+
 				for (auto object = objects.begin(); object != objects.end(); object++)
 				{	
 					ReturnVal intersectionDetails = (*object)->intersect(primaryRay);
-					if(intersectionDetails.isIntersects){
+					if(intersectionDetails.isIntersects && minT > intersectionDetails.t1){
+
+						// cout << "minT: " << minT << endl;
+
+						hitPoint = intersectionDetails; // shallow copy, what happens to array variables?
+
+						minT = intersectionDetails.t1;
+					}					
+				}
+				if(hitPoint.isIntersects && minT < infinity && minT > (-1)*intTestEps){
 						values.red = 255;
 						values.grn = 255;
 						values.blu = 255;
 
 						counter++;
-						break;
-
-						// if(minT < intersectionDetails.t1){
-
-						// 	hitPoint.intersectionPoint1[0] = intersectionDetails.intersectionPoint1[0];
-						// 	hitPoint.intersectionPoint1[1] = intersectionDetails.intersectionPoint1[1];
-						// 	hitPoint.intersectionPoint1[2] = intersectionDetails.intersectionPoint1[2];
-
-						// 	hitPoint.intersectionPoint2[0] = intersectionDetails.intersectionPoint2[0];
-						// 	hitPoint.intersectionPoint2[1] = intersectionDetails.intersectionPoint2[1];
-						// 	hitPoint.intersectionPoint2[1] = intersectionDetails.intersectionPoint2[2];
-
-						// 	hitPoint.isIntersects = true;
-
-						// 	hitPoint.normal[0] = intersectionDetails.normal[0];
-						// 	hitPoint.normal[1] = intersectionDetails.normal[1];
-						// 	hitPoint.normal[2] = intersectionDetails.normal[2];
-
-						// 	hitPoint.t1 = intersectionDetails.t1;
-						// 	hitPoint.t2 = intersectionDetails.t2;
-
-						// 	hitPoint.type = intersectionDetails.type;
-
-						// 	minT = intersectionDetails.t1;
-						// }
-					}
-					else{
-						values.red = backgroundColor.r;
-						values.grn = backgroundColor.g;
-						values.blu = backgroundColor.b;
-					}
-					
 				}
-				// if(hitPoint.isIntersects && minT < maxT){
-				// 		values.red = 255;
-				// 		values.grn = 255;
-				// 		values.blu = 255;
-
-				// 		counter++;
-				// 		// break;
-				// 	}
-				// else{
-				// 		values.red = backgroundColor.r;
-				// 		values.grn = backgroundColor.g;
-				// 		values.blu = backgroundColor.b;
-				// 	}
 				total++;
 				renderedImage.setPixelValue(y,x, values);
 			}
