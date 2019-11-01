@@ -45,11 +45,11 @@ Sphere::Sphere(int id, int matIndex, int cIndex, float R, vector<Vector3f> *pVer
 
 
 
-    cout <<"sphere center: [ " 
-    << center.x 
-    << " , "<< center.y
-    << " , "<< center.z
-    << " ] " << endl;
+    // cout <<"sphere center: [ " 
+    // << center.x 
+    // << " , "<< center.y
+    // << " , "<< center.z
+    // << " ] " << endl;
 
 
 }
@@ -222,17 +222,17 @@ Triangle::Triangle(int id, int matIndex, int p1Index, int p2Index, int p3Index, 
     p3.y = pVertices->at(p3Index-1).y;
     p3.z = pVertices->at(p3Index-1).z;
 
-    cout <<"triangle: [ " 
-    << p1.x 
-    << " , "<< p1.y
-    << " , "<< p1.z
-    << " ] - [ " << p2.x 
-    << " , "<< p2.y
-    << " , "<< p2.z
-    << " ] - [ "<< p3.x 
-    << " , "<< p3.y
-    << " , "<< p3.z
-    << " ] " <<endl;
+    // cout <<"triangle: [ " 
+    // << p1.x 
+    // << " , "<< p1.y
+    // << " , "<< p1.z
+    // << " ] - [ " << p2.x 
+    // << " , "<< p2.y
+    // << " , "<< p2.z
+    // << " ] - [ "<< p3.x 
+    // << " , "<< p3.y
+    // << " , "<< p3.z
+    // << " ] " <<endl;
 }
 
 /* Triangle-ray intersection routine. You will implement this. 
@@ -403,7 +403,7 @@ Mesh::Mesh(int id, int matIndex, const vector<Triangle>& faces, vector<int> *pIn
     this->faces = faces;
     this->pIndecies = pIndecies;
     this->vertices = vertices;
-    cout<< "mesh construction" << endl;
+    // cout<< "mesh construction" << endl;
 }
 
 /* Mesh-ray intersection routine. You will implement this. 

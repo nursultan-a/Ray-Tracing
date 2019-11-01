@@ -99,7 +99,7 @@ void Scene::renderScene(void)
 						normal.z = hitPoint.normal[2];
 
 						// normal = normal);
-						cout << normal.x << ", " << normal.y << ", " << normal.z << "type: "<<hitPoint.type <<endl;
+						// cout << normal.x << ", " << normal.y << ", " << normal.z << "type: "<<hitPoint.type <<endl;
 						if(dotProduct(normalize(wi), normal)>0.0){
 							cosTheta = dotProduct(normalize(wi), normal);
 						}
